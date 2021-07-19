@@ -1,0 +1,47 @@
+// Variables
+
+$accent: orange
+$fontsize: 16px
+$textcolor: gray
+$lineheight: 1.7
+$userfont: roboto
+$systemfont: Arial
+
+// Imports
+@import '../../../node_modules/normalize.css/normalize.css'
+@import '../../../node_modules/slick-carousel/slick/slick.css'
+@import '../../../node_modules/animate.css/animate.css'
+
+// Fonts
+@mixin font($fname, $fstyle, $fweight, $furl)
+    @font-face
+        font-family: $fname
+        font-style: $fstyle
+        font-weight: $fweight
+        src: url($furl);
+
+// font('', normal, 400, '../fonts/..')
+
+// General
+::placeholder
+    color: #666
+
+::selection
+    background-color: $accent
+    color: #fff
+
+input, textarea
+    outline: none
+    &:focus:required:invalid
+        border-color: red
+    &:forus:valid
+        border-color: green
+
+body
+    font-family: $userfont
+    font-size: $fontsize
+    line-height: $lineheight
+    color: $textcolor
+    min-width: 320px
+    position: relative
+    overflow-x: hidden
