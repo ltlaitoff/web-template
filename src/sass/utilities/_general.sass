@@ -1,0 +1,14 @@
+// General
+::placeholder
+    color: #666
+
+::selection
+    background-color: #fff // Заменить
+    color: #fff
+
+input, textarea
+    outline: none
+    &:focus:required:invalid
+        border-color: red
+    &:forus:valid
+        border-color: green

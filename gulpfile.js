@@ -21,26 +21,28 @@ const {src, dest, parallel, series, watch, task} = require('gulp'),
 	path = {
 		build: {
 			html: distPath,
-			js: distPath + "assets/js/",
-			css: distPath + "assets/css/",
-			images: distPath + "assets/images/",
-			fonts: distPath + "assets/fonts/"
+			js: distPath + "js/",
+			css: distPath + "css/",
+			images: distPath + "images/",
+			icons: distPath + "icons/",
+			fonts: distPath + "fonts/"
 		},
 		src: {
 			html: srcPath + "*.html",
-			js: srcPath + "assets/js/**/*.js",
-			css: srcPath + "assets/sass/style.sass",
-			cssLibs: srcPath + "assets/sass/default",
-			jsLibs: srcPath + "assets/js",
-			images: srcPath + "assets/images/**/*.{jpg,png,svg,gif,ico,webp,webmanifest,xml,json}",
-			fonts: srcPath + "assets/fonts/**/*.{eot,woff,woff2,ttf,svg}"
+			js: srcPath + "js/**/*.js",
+			css: srcPath + "sass/style.sass",
+			jsLibs: srcPath + "js",
+			images: srcPath + "images/**/*.{jpg,png,svg,gif,ico,webp,webmanifest,xml,json}",
+			icons: distPath + "icons/**/*.{jpg,png,svg,gif,ico,webp,webmanifest,xml,json}",
+			fonts: srcPath + "fonts/**/*.{eot,woff,woff2,ttf,svg}"
 		},
 		watch: {
 			html: srcPath + "**/*.html",
-			js: srcPath + "assets/js/**/*.js",
-			css: srcPath + "assets/sass/**/*.sass",
-			images: srcPath + "assets/images/**/*.{jpg,png,svg,gif,ico,webp,webmanifest,xml,json}",
-			fonts: srcPath + "assets/fonts/**/*.{eot,woff,woff2,ttf,svg}"
+			js: srcPath + "js/**/*.js",
+			css: srcPath + "sass/**/*.sass",
+			images: srcPath + "images/**/*.{jpg,png,svg,gif,ico,webp,webmanifest,xml,json}",
+			icons: distPath + "icons/**/*.{jpg,png,svg,gif,ico,webp,webmanifest,xml,json}",
+			fonts: srcPath + "fonts/**/*.{eot,woff,woff2,ttf,svg}"
 		},
 		clean: "./" + distPath
 	};
@@ -61,7 +63,7 @@ task('html', () => {
 		.pipe(panini({
 			root: srcPath,
 			layouts: srcPath + 'layouts/',
-			partials: srcPath + 'partials/',
+			partials: srcPath + 'templates/',
 			helpers: srcPath + 'helpers/',
 			data: srcPath + 'data/'
 		}))
@@ -123,6 +125,24 @@ task('images', () => {
 		.pipe(browserSync.reload({ stream: true }));
 });
 
+
+task('icons', () => {
+	return src(path.src.icons)
+		.pipe(imagemin([
+			imagemin.gifsicle({ interlaced: true }),
+			imagemin.mozjpeg({ quality: 95, progressive: true }),
+			imagemin.optipng({ optimizationLevel: 5 }),
+			imagemin.svgo({
+				plugins: [
+					{ removeViewBox: true },
+					{ cleanupIDs: false }
+				]
+			})
+		]))
+		.pipe(dest(path.build.icons))
+		.pipe(browserSync.reload({ stream: true }));
+});
+
 task('fonts', () => {
 	return src(path.src.fonts)
 		.pipe(dest(path.build.fonts))
@@ -139,11 +159,12 @@ task('watch', () => {
 	watch([path.watch.js], series('js'));
 	watch([path.watch.images], series('images'));
 	watch([path.watch.fonts], series('fonts'));
+	watch([path.watch.icons], series('icons'));
 });
 
 const 
 	libs = series('jsLibs'),
-	build = series('clean', libs, parallel('html', 'css', 'js', 'images', 'fonts')),
+	build = series('clean', libs, parallel('html', 'css', 'js', 'images', 'icons', 'fonts')),
 	watchTask = parallel(build, 'watch', 'server');
 
 exports.default = watchTask;
